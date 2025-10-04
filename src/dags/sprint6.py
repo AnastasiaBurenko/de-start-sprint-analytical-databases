@@ -4,6 +4,7 @@ from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 from airflow.hooks.base import BaseHook
 from airflow.operators.python import PythonOperator
+from airflow.models.variable import Variable
 import boto3
 
 from files import vertica_copy as vertica
@@ -11,8 +12,8 @@ from files import vertica_copy as vertica
 vertica_conn = BaseHook.get_connection(conn_id="de_vertica")
 staging_schema = "STV202509119__STAGING"
 
-AWS_ACCESS_KEY_ID = "YCAJEiyNFq4wiOe_eMCMCXmQP"
-AWS_SECRET_ACCESS_KEY = "YCP1e96y4QI8OmcB4Eaf4q0nMHwhmtvGbDTgBeqS"
+aws_key = Variable.get("AWS_ACCESS_KEY_ID")
+aws_access = Variable.get("AWS_SECRET_ACCESS_KEY")
 
 
 def fetch_s3_file(bucket: str, key: str, filename: str):
@@ -20,8 +21,8 @@ def fetch_s3_file(bucket: str, key: str, filename: str):
     s3_client = session.client(
         service_name='s3',
         endpoint_url='https://storage.yandexcloud.net',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        aws_access_key_id=aws_key,
+        aws_secret_access_key=aws_access,
     )
     s3_client.download_file(
         Bucket=bucket,
